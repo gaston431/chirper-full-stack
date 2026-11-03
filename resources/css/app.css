@@ -1,24 +1,42 @@
-@import 'tailwindcss';
+@import 'bootstrap/dist/css/bootstrap.min.css';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-
-    --animate-fade-out: fade-out 4s ease-in-out forwards;
-
-    @keyframes fade-out {
-        0%, 70% {
-            opacity: 1;
-        }
-        100% {
-            opacity: 0;
-            pointer-events: none;
-        }
-    }
+body {
+    font-family: 'Instrument Sans', var(--bs-font-sans-serif);
 }
 
+.chirp-textarea {
+    resize: none;
+}
+
+.chirp-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: cover;
+}
+
+.chirp-content {
+    min-width: 0;
+}
+
+.auth-page {
+    min-height: calc(100vh - 11rem);
+}
+
+.auth-card {
+    max-width: 24rem;
+}
+
+.animate-fade-out {
+    animation: fade-out 4s ease-in-out forwards;
+}
+
+@keyframes fade-out {
+    0%, 70% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        pointer-events: none;
+    }
+}

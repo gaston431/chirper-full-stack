@@ -3,71 +3,59 @@
         Sign In
     </x-slot:title>
 
-    <div class="hero min-h-[calc(100vh-16rem)]">
-        <div class="hero-content flex-col">
-            <div class="card w-96 bg-base-100">
-                <div class="card-body">
-                    <h1 class="text-3xl font-bold text-center mb-6">Welcome Back</h1>
+    <div class="auth-page d-flex align-items-center justify-content-center">
+        <div class="card auth-card w-100 shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="fs-2 fw-bold text-center mb-4">Welcome Back</h1>
 
-                    <form method="POST" action="/login">
-                        @csrf
+                <form method="POST" action="/login">
+                    @csrf
 
-                        <!-- Email -->
-                        <label class="floating-label mb-6">
-                            <input type="email"
-                                   name="email"
-                                   placeholder="[mail@example.com](<mailto:mail@example.com>)"
-                                   value="{{ old('email') }}"
-                                   class="input input-bordered @error('email') input-error @enderror"
-                                   required
-                                   autofocus>
-                            <span>Email</span>
-                        </label>
+                    <div class="form-floating mb-3">
+                        <input type="email"
+                               name="email"
+                               id="email"
+                               placeholder="name@example.com"
+                               value="{{ old('email') }}"
+                               class="form-control @error('email') is-invalid @enderror"
+                               required
+                               autofocus>
+                        <label for="email">Email</label>
                         @error('email')
-                            <div class="label -mt-4 mb-2">
-                                <span class="label-text-alt text-error">{{ $message }}</span>
-                            </div>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
+                    </div>
 
-                        <!-- Password -->
-                        <label class="floating-label mb-6">
-                            <input type="password"
-                                   name="password"
-                                   placeholder="••••••••"
-                                   class="input input-bordered @error('password') input-error @enderror"
-                                   required>
-                            <span>Password</span>
-                        </label>
+                    <div class="form-floating mb-3">
+                        <input type="password"
+                               name="password"
+                               id="password"
+                               placeholder="Password"
+                               class="form-control @error('password') is-invalid @enderror"
+                               required>
+                        <label for="password">Password</label>
                         @error('password')
-                            <div class="label -mt-4 mb-2">
-                                <span class="label-text-alt text-error">{{ $message }}</span>
-                            </div>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
+                    </div>
 
-                        <!-- Remember Me -->
-                        <div class="form-control mt-4">
-                            <label class="label cursor-pointer justify-start">
-                                <input type="checkbox"
-                                       name="remember"
-                                       class="checkbox">
-                                <span class="label-text ml-2">Remember me</span>
-                            </label>
-                        </div>
+                    <div class="form-check mt-3">
+                        <input type="checkbox" name="remember" id="remember" class="form-check-input">
+                        <label class="form-check-label" for="remember">Remember me</label>
+                    </div>
 
-                        <!-- Submit Button -->
-                        <div class="form-control mt-8">
-                            <button type="submit" class="btn btn-primary btn-sm w-full">
-                                Sign In
-                            </button>
-                        </div>
-                    </form>
+                    <button type="submit" class="btn btn-primary btn-sm w-100 mt-4">Sign In</button>
+                </form>
 
-                    <div class="divider">OR</div>
-                    <p class="text-center text-sm">
-                        Don't have an account?
-                        <a href="/register" class="link link-primary">Register</a>
-                    </p>
+                <div class="d-flex align-items-center my-4">
+                    <hr class="flex-grow-1">
+                    <span class="px-3 text-secondary">OR</span>
+                    <hr class="flex-grow-1">
                 </div>
+                <p class="text-center small mb-0">
+                    Don't have an account?
+                    <a href="/register" class="link-primary">Register</a>
+                </p>
             </div>
         </div>
     </div>
