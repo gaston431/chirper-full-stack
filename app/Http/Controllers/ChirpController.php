@@ -32,12 +32,33 @@ class ChirpController extends Controller
         //     ]
         // ];
 
-        $chirps = Chirp::with('user')
+        // $chirps = Chirp::with('user')
+        //     ->latest()
+        //     ->take(50)
+        //     ->get();
+
+        // return view('home', ['chirps' => $chirps]);
+        return view('home', ['chirps' => []]);
+    }
+
+    public function getChirps(Request $request)
+    {
+
+        $search = $request->input('search') ?? '';
+        // dd($search);
+        $chirps = Chirp::where('message', 'LIKE', "%$search%")->with('user')
             ->latest()
             ->take(50)
             ->get();
 
-        return view('home', ['chirps' => $chirps]);
+        $html = '';
+        foreach ($chirps as $chirp) {
+            $html .= view('components.chirp', compact('chirp'))->render();
+        }
+
+        return response($html, 200)->header('Content-Type', 'text/html');
+
+        // return response()->json($chirps, 200);
     }
 
     /**
@@ -71,7 +92,7 @@ class ChirpController extends Controller
         //     'message' => $validated['message'],
         //     'user_id' => null, // We'll add authentication in lesson 11
         // ]);
-        
+
         // Use the authenticated user
         $request->user()->chirps()->create($validated);
 

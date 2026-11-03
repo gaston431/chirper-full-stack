@@ -11,6 +11,7 @@ Route::get('/', function () {
 });
 
 Route::get('/', [ChirpController::class, 'index']);
+Route::get('/getChirps', [ChirpController::class, 'getChirps']);
 // Route::middleware('auth')->group(function () {
 // Route::post('/chirps', [ChirpController::class, 'store']);
 // Route::get('/chirps/{chirp}/edit', [ChirpController::class, 'edit']);

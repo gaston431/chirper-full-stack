@@ -11,13 +11,8 @@
                 <form method="POST" action="/chirps">
                     @csrf
                     <div>
-                        <textarea
-                            name="message"
-                            placeholder="What's on your mind?"
-                            class="form-control chirp-textarea @error('message') is-invalid @enderror"
-                            rows="4"
-                            required
-                        >{{ old('message') }}</textarea>
+                        <textarea name="message" placeholder="What's on your mind?"
+                            class="form-control chirp-textarea @error('message') is-invalid @enderror" rows="4" required>{{ old('message') }}</textarea>
 
                         @error('message')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -32,19 +27,54 @@
         </div>
 
         <div class="d-flex flex-column gap-3 mt-4">
-            @forelse ($chirps as $chirp)
-                <x-chirp :chirp="$chirp" />
-            @empty
-                <div class="py-5 text-center">
-                    <svg class="text-secondary opacity-50" width="48" height="48" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                        </path>
-                    </svg>
-                    <p class="text-secondary mt-3">No chirps yet. Be the first to chirp!</p>
-                </div>
-            @endforelse
+            <div class="">
+                <label for="search">Search:</label>
+                <input type="text" name="search" id="search" placeholder="Filter Chirps" class="form-control">
+            </div>
+            <div id="container">
+                @forelse ($chirps as $chirp)
+                    <x-chirp :chirp="$chirp" />
+                @empty
+                    <div class="py-5 text-center">
+                        <svg class="text-secondary opacity-50" width="48" height="48" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                            </path>
+                        </svg>
+                        <p class="text-secondary mt-3">No chirps yet. Be the first to chirp!</p>
+                    </div>
+                @endforelse
+            </div>
         </div>
     </div>
+
+    <script type="module">
+        const div = document.getElementById('container')
+        const API_URL = 'http://localhost:8000/getChirps'
+        const inputSearch = document.getElementById('search')
+        // let chirps = []
+        let search = inputSearch.value ?? ''
+        const loadChirps = async (search) => {
+            try {
+                const response = await fetch(API_URL + "?search=" + encodeURIComponent(search))
+                // console.log(response.ok)
+                if (!response.ok) throw new Error('Error al obtener chirps')
+                // return await response.json()
+                const htmlContent = await response.text()
+                // console.log(htmlContent)
+                div.innerHTML = htmlContent
+            } catch (error) {
+                console.error(error)
+                alert('No se pudo conectar con la API')
+            }
+        }
+
+        await loadChirps(search)
+
+        inputSearch.addEventListener('input', async function(){
+            await loadChirps(inputSearch.value)
+        })
+
+    </script>
 </x-layout>
