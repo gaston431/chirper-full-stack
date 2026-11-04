@@ -26,30 +26,25 @@
             </div>
         </div>
 
-        <div class="d-flex flex-column gap-3 mt-4">
-            <div class="">
-                <label for="search">Search:</label>
-                <input type="text" name="search" id="search" placeholder="Filter Chirps" class="form-control">
+        <form method="GET" action="{{ route('home') }}" class="mt-4" id="chirp-search-form"
+            data-search-url="{{ route('chirps.search') }}">
+            <label for="search" class="form-label">Search chirps</label>
+            <div class="input-group">
+                <input type="search" name="search" id="search" value="{{ $search }}"
+                    placeholder="Filter by message" class="form-control" maxlength="100">
+                
+                <button type="button" class="btn btn-outline-secondary" id="clear-search"
+                    @disabled($search === '')>Clear</button>
             </div>
-            <div id="container">
-                @forelse ($chirps as $chirp)
-                    <x-chirp :chirp="$chirp" />
-                @empty
-                    <div class="py-5 text-center">
-                        <svg class="text-secondary opacity-50" width="48" height="48" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                            </path>
-                        </svg>
-                        <p class="text-secondary mt-3">No chirps yet. Be the first to chirp!</p>
-                    </div>
-                @endforelse
-            </div>
+        </form>
+
+        <div class="mt-4" id="chirp-search-error" role="alert" hidden></div>
+        <div id="chirp-results" aria-live="polite" aria-busy="false">
+            @include('components.chirp-list', ['chirps' => $chirps, 'search' => $search])
         </div>
     </div>
 
-    <script type="module">
+    {{-- <script type="module">
         const div = document.getElementById('container')
         const API_URL = 'http://localhost:8000/getChirps'
         const inputSearch = document.getElementById('search')
@@ -76,5 +71,5 @@
             await loadChirps(inputSearch.value)
         })
 
-    </script>
+    </script> --}}
 </x-layout>

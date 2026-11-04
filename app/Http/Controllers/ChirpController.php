@@ -3,63 +3,68 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chirp;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
 
 class ChirpController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): View
     {
-        // $chirps = [
-        //     [
-        //         'author' => 'Jane Doe',
-        //         'message' => 'Just deployed my first Laravel app! 🚀',
-        //         'time' => '5 minutes ago'
-        //     ],
-        //     [
-        //         'author' => 'John Smith',
-        //         'message' => 'Laravel makes web development fun again!',
-        //         'time' => '1 hour ago'
-        //     ],
-        //     [
-        //         'author' => 'Alice Johnson',
-        //         'message' => 'Working on something cool with Chirper...',
-        //         'time' => '3 hours ago'
-        //     ]
-        // ];
+        $search = $this->validatedSearch($request);
+        $chirps = $this->chirps($search);
 
-        // $chirps = Chirp::with('user')
-        //     ->latest()
-        //     ->take(50)
-        //     ->get();
-
-        // return view('home', ['chirps' => $chirps]);
-        return view('home', ['chirps' => []]);
+        return view('home', compact('chirps', 'search'));
     }
 
-    public function getChirps(Request $request)
+    public function search(Request $request): View
     {
+        $search = $this->validatedSearch($request);
+        $chirps = $this->chirps($search);
 
-        $search = $request->input('search') ?? '';
-        // dd($search);
-        $chirps = Chirp::where('message', 'LIKE', "%$search%")->with('user')
+        return view('components.chirp-list', compact('chirps', 'search'));
+    }
+
+    private function validatedSearch(Request $request): string
+    {
+        $validated = $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        return trim($validated['search'] ?? '');
+    }
+
+    private function chirps(string $search): LengthAwarePaginator
+    {
+        return Chirp::query()
+            ->with('user')
+            ->when($search !== '', fn ($query) => $query->where('message', 'like', "%{$search}%"))
             ->latest()
-            ->take(50)
-            ->get();
-
-        $html = '';
-        foreach ($chirps as $chirp) {
-            $html .= view('components.chirp', compact('chirp'))->render();
-        }
-
-        return response($html, 200)->header('Content-Type', 'text/html');
-
-        // return response()->json($chirps, 200);
+            ->paginate(10)
+            ->withQueryString();
     }
+
+    // public function getChirps(Request $request)
+    // {
+
+    //     $search = $request->input('search') ?? '';
+    //     // dd($search);
+    //     $chirps = Chirp::where('message', 'LIKE', "%$search%")->with('user')
+    //         ->latest()
+    //         ->take(50)
+    //         ->get();
+
+    //     $html = '';
+    //     foreach ($chirps as $chirp) {
+    //         $html .= view('components.chirp', compact('chirp'))->render();
+    //     }
+
+    //     return response($html, 200)->header('Content-Type', 'text/html');
+    // }
 
     /**
      * Show the form for creating a new resource.

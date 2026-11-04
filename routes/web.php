@@ -6,12 +6,8 @@ use App\Http\Controllers\Auth\Register;
 use App\Http\Controllers\ChirpController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('home');
-});
-
-Route::get('/', [ChirpController::class, 'index']);
-Route::get('/getChirps', [ChirpController::class, 'getChirps']);
+Route::get('/', [ChirpController::class, 'index'])->name('home');
+Route::get('/chirps/search', [ChirpController::class, 'search'])->name('chirps.search');
 // Route::middleware('auth')->group(function () {
 // Route::post('/chirps', [ChirpController::class, 'store']);
 // Route::get('/chirps/{chirp}/edit', [ChirpController::class, 'edit']);
