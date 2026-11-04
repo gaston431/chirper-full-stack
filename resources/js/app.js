@@ -10,23 +10,23 @@ if (searchForm && searchInput && clearSearchButton && chirpResults && searchErro
     let debounceTimeout;
     let activeRequest;
 
-    // const updateBrowserUrl = (search, page = null) => {
-    //     const url = new URL(window.location.href);
+    const updateBrowserUrl = (search, page = null) => {
+        const url = new URL(window.location.href);
 
-    //     if (search) {
-    //         url.searchParams.set('search', search);
-    //     } else {
-    //         url.searchParams.delete('search');
-    //     }
+        if (search) {
+            url.searchParams.set('search', search);
+        } else {
+            url.searchParams.delete('search');
+        }
 
-    //     if (page && page !== '1') {
-    //         url.searchParams.set('page', page);
-    //     } else {
-    //         url.searchParams.delete('page');
-    //     }
+        if (page && page !== '1') {
+            url.searchParams.set('page', page);
+        } else {
+            url.searchParams.delete('page');
+        }
 
-    //     window.history.replaceState(null, '', url);
-    // };
+        window.history.replaceState(null, '', url);
+    };
 
     const loadChirps = async (requestUrl = null) => {
         activeRequest?.abort();
@@ -76,7 +76,7 @@ if (searchForm && searchInput && clearSearchButton && chirpResults && searchErro
             const search = url.searchParams.get('search') ?? '';
             searchInput.value = search;
             clearSearchButton.disabled = search === '';
-            // updateBrowserUrl(search, url.searchParams.get('page'));
+            updateBrowserUrl(search, url.searchParams.get('page'));
         } catch (error) {
             if (error.name !== 'AbortError') {
                 searchError.textContent = error.message;
@@ -110,33 +110,33 @@ if (searchForm && searchInput && clearSearchButton && chirpResults && searchErro
         searchInput.focus();
     });
 
-    // chirpResults.addEventListener('click', (event) => {
-    //     const paginationLink = event.target.closest('.pagination a[href]');
+    chirpResults.addEventListener('click', (event) => {
+        const paginationLink = event.target.closest('.pagination a[href]');
 
-    //     if (!paginationLink) {
-    //         return;
-    //     }
+        if (!paginationLink) {
+            return;
+        }
 
-    //     const clickedUrl = new URL(paginationLink.href);
+        const clickedUrl = new URL(paginationLink.href);
 
-    //     if (clickedUrl.origin !== window.location.origin) {
-    //         return;
-    //     }
+        if (clickedUrl.origin !== window.location.origin) {
+            return;
+        }
 
-    //     const url = new URL(searchForm.dataset.searchUrl, window.location.origin);
-    //     const search = searchInput.value.trim();
-    //     const page = clickedUrl.searchParams.get('page');
+        const url = new URL(searchForm.dataset.searchUrl, window.location.origin);
+        const search = searchInput.value.trim();
+        const page = clickedUrl.searchParams.get('page');
 
-    //     if (search) {
-    //         url.searchParams.set('search', search);
-    //     }
+        if (search) {
+            url.searchParams.set('search', search);
+        }
 
-    //     if (page) {
-    //         url.searchParams.set('page', page);
-    //     }
+        if (page) {
+            url.searchParams.set('page', page);
+        }
 
-    //     event.preventDefault();
-    //     window.clearTimeout(debounceTimeout);
-    //     loadChirps(url);
-    // });
+        event.preventDefault();
+        window.clearTimeout(debounceTimeout);
+        loadChirps(url);
+    });
 }
