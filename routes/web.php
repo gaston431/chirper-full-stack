@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\Login;
 use App\Http\Controllers\Auth\Logout;
 use App\Http\Controllers\Auth\Register;
 use App\Http\Controllers\ChirpController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ChirpController::class, 'index'])->name('home');
@@ -37,3 +38,11 @@ Route::post('/login', Login::class)
 Route::post('/logout', Logout::class)
     ->middleware('auth')
     ->name('logout');
+
+Route::get('/user/{user}', [UserController::class, 'index'])
+    // ->middleware('auth')
+    ->name('profile');
+
+Route::get('/user/{user}/chirps/search', [UserController::class, 'search'])
+    // ->middleware('auth')
+    ->name('user.chirps.search');

@@ -16,7 +16,7 @@
             <a href="/" class="navbar-brand fw-semibold">🐦 Chirper</a>
             <div class="d-flex align-items-center gap-2 ms-auto">
                 @auth
-                    <span class="small text-secondary">{{ auth()->user()->name }}</span>
+                    <a href="{{ route('profile', auth()->id()) }}"><span class="small text-secondary">{{ auth()->user()->name }}</span></a>
                     <form method="POST" action="/logout" class="m-0">
                         @csrf
                         <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>

@@ -1,12 +1,25 @@
+import $ from 'jquery';
 import 'bootstrap';
 
-const searchForm = document.getElementById('chirp-search-form');
-const searchInput = document.getElementById('search');
-const clearSearchButton = document.getElementById('clear-search');
-const chirpResults = document.getElementById('chirp-results');
-const searchError = document.getElementById('chirp-search-error');
+window.$ = window.jQuery = $;
 
-if (searchForm && searchInput && clearSearchButton && chirpResults && searchError) {
+$(function () {
+    const searchForm = $('#chirp-search-form');
+    const searchInput = $('#search');
+    const clearSearchButton = $('#clear-search');
+    const chirpResults = $('#chirp-results');
+    const searchError = $('#chirp-search-error');
+
+    if (
+        !searchForm.length
+        || !searchInput.length
+        || !clearSearchButton.length
+        || !chirpResults.length
+        || !searchError.length
+    ) {
+        return;
+    }
+
     let debounceTimeout;
     let activeRequest;
 
@@ -28,19 +41,17 @@ if (searchForm && searchInput && clearSearchButton && chirpResults && searchErro
         window.history.replaceState(null, '', url);
     };
 
-    const loadChirps = async (requestUrl = null) => {
+    const loadChirps = (requestUrl = null) => {
         activeRequest?.abort();
 
-        const controller = new AbortController();
-        activeRequest = controller;
-        chirpResults.setAttribute('aria-busy', 'true');
-        searchError.hidden = true;
-        clearSearchButton.disabled = searchInput.value.trim() === '';
+        chirpResults.attr('aria-busy', 'true');
+        searchError.prop('hidden', true);
+        clearSearchButton.prop('disabled', !searchInput.val().trim());
 
-        const url = requestUrl ?? new URL(searchForm.dataset.searchUrl, window.location.origin);
-        // console.log(url)
+        const url = requestUrl ?? new URL(searchForm.data('search-url'), window.location.origin);
+
         if (!requestUrl) {
-            const search = searchInput.value.trim();
+            const search = searchInput.val().trim();
 
             if (search) {
                 url.searchParams.set('search', search);
@@ -51,80 +62,79 @@ if (searchForm && searchInput && clearSearchButton && chirpResults && searchErro
             url.searchParams.delete('page');
         }
 
-        try {
-            const response = await fetch(url, {
-                headers: {
-                    Accept: 'application/json, text/html',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                signal: controller.signal,
-            });
+        const request = $.ajax({
+            url: url.toString(),
+            method: 'GET',
+            dataType: 'html',
+            headers: {
+                Accept: 'application/json, text/html',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
 
-            if (!response.ok) {
-                let message = 'Unable to load chirps. Please try again.';
+        activeRequest = request;
 
-                if (response.headers.get('content-type')?.includes('application/json')) {
-                    const payload = await response.json();
-                    message = payload.errors?.search?.[0] ?? payload.message ?? message;
-                }
-
-                throw new Error(message);
-            }
-
-            chirpResults.innerHTML = await response.text();
+        request.done((html) => {
+            chirpResults.html(html);
 
             const search = url.searchParams.get('search') ?? '';
-            searchInput.value = search;
-            clearSearchButton.disabled = search === '';
+            searchInput.val(search);
+            clearSearchButton.prop('disabled', search === '');
             updateBrowserUrl(search, url.searchParams.get('page'));
-        } catch (error) {
-            if (error.name !== 'AbortError') {
-                searchError.textContent = error.message;
-                searchError.className = 'alert alert-danger mt-4';
-                searchError.hidden = false;
+        });
+
+        request.fail((xhr, status) => {
+            if (status === 'abort') {
+                return;
             }
-        } finally {
-            if (activeRequest === controller) {
+
+            const message = xhr.responseJSON?.errors?.search?.[0]
+                ?? xhr.responseJSON?.message
+                ?? 'Unable to load chirps. Please try again.';
+
+            searchError
+                .text(message)
+                .removeClass('d-none')
+                .addClass('alert alert-danger mt-4')
+                .prop('hidden', false);
+        });
+
+        request.always(() => {
+            if (activeRequest === request) {
                 activeRequest = null;
-                chirpResults.setAttribute('aria-busy', 'false');
+                chirpResults.attr('aria-busy', 'false');
             }
-        }
+        });
     };
 
-    searchInput.addEventListener('input', () => {
+    searchInput.on('input', () => {
         window.clearTimeout(debounceTimeout);
-        clearSearchButton.disabled = searchInput.value.trim() === '';
+        clearSearchButton.prop('disabled', !searchInput.val().trim());
         debounceTimeout = window.setTimeout(() => loadChirps(), 300);
     });
 
-    // searchForm.addEventListener('submit', (event) => {
+    // searchForm.on('submit', (event) => {
     //     event.preventDefault();
     //     window.clearTimeout(debounceTimeout);
     //     loadChirps();
     // });
 
-    clearSearchButton.addEventListener('click', () => {
+    clearSearchButton.on('click', () => {
         window.clearTimeout(debounceTimeout);
-        searchInput.value = '';
+        searchInput.val('');
         loadChirps();
-        searchInput.focus();
+        searchInput.trigger('focus');
     });
 
-    chirpResults.addEventListener('click', (event) => {
-        const paginationLink = event.target.closest('.pagination a[href]');
-
-        if (!paginationLink) {
-            return;
-        }
-
-        const clickedUrl = new URL(paginationLink.href);
+    chirpResults.on('click', '.pagination a[href]', function (event) {
+        const clickedUrl = new URL(this.href);
 
         if (clickedUrl.origin !== window.location.origin) {
             return;
         }
 
-        const url = new URL(searchForm.dataset.searchUrl, window.location.origin);
-        const search = searchInput.value.trim();
+        const url = new URL(searchForm.data('search-url'), window.location.origin);
+        const search = searchInput.val().trim();
         const page = clickedUrl.searchParams.get('page');
 
         if (search) {
@@ -139,4 +149,4 @@ if (searchForm && searchInput && clearSearchButton && chirpResults && searchErro
         window.clearTimeout(debounceTimeout);
         loadChirps(url);
     });
-}
+});

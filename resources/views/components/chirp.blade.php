@@ -14,7 +14,14 @@
             <div class="flex-grow-1 chirp-content">
                 <div class="d-flex justify-content-between align-items-start gap-2 w-100">
                     <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <span class="small fw-semibold">{{ $chirp->user ? $chirp->user->name : 'Anonymous' }}</span>
+                        @if($chirp->user)
+                            <a href="{{ route('profile', $chirp->user) }}" class="small fw-semibold text-decoration-none text-reset"> 
+                                {{ $chirp->user->name }}
+                            </a>
+                        @else
+                            <span class="small fw-semibold">Anonymous</span>
+                        @endif
+                        
                         <span class="text-secondary">·</span>
                         <span class="small text-secondary">{{ $chirp->created_at->diffForHumans() }}</span>
                         @if ($chirp->updated_at->gt($chirp->created_at->addSeconds(5)))
