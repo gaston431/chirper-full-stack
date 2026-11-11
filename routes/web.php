@@ -46,3 +46,7 @@ Route::get('/user/{user}', [UserController::class, 'index'])
 Route::get('/user/{user}/chirps/search', [UserController::class, 'search'])
     // ->middleware('auth')
     ->name('user.chirps.search');
+
+
+Route::livewire('/chirp/home', 'pages::chirp.home');
+Route::livewire('/chirp/{chirp}/edit', 'pages::chirp.edit')->middleware('auth');

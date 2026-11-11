@@ -95,7 +95,7 @@ class ChirpController extends Controller
 
         // Chirp::create([
         //     'message' => $validated['message'],
-        //     'user_id' => null, // We'll add authentication in lesson 11
+        //     'user_id' => null,
         // ]);
 
         // Use the authenticated user
