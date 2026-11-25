@@ -7,6 +7,46 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Implementaciones por rama
+
+El proyecto contiene dos implementaciones de la interfaz dinámica de Chirper:
+
+### `master`: JavaScript y jQuery
+
+La búsqueda se realiza con AJAX y actualiza la lista de chirps sin recargar la página. Las vistas Blade generan el HTML de los resultados.
+
+Rutas principales:
+
+| Método | Ruta | Función |
+| --- | --- | --- |
+| `GET` | `/` | Feed de chirps |
+| `GET` | `/chirps/search` | Resultados dinámicos del feed |
+| `GET` | `/user/{user}` | Perfil y chirps de un usuario |
+| `GET` | `/user/{user}/chirps/search` | Búsqueda en el perfil |
+| `GET` | `/chirps/{chirp}/edit` | Formulario tradicional para editar un chirp |
+
+Las rutas para crear, actualizar y eliminar chirps también están definidas como rutas resource protegidas con autenticación.
+
+### `feature/livewire`: Laravel Livewire
+
+La búsqueda, la creación, la edición y la eliminación se manejan con componentes Livewire y enlaces `wire:*`; no se necesita escribir JavaScript ni jQuery propio para esas interacciones. Livewire sí carga y utiliza su runtime de JavaScript internamente.
+
+Rutas de las páginas Livewire:
+
+| Método | Ruta | Función |
+| --- | --- | --- |
+| `GET` | `/chirp/home` | Feed interactivo con búsqueda y creación de chirps |
+| `GET` | `/chirp/{chirp}/edit` | Edición interactiva de un chirp; requiere autenticación |
+
+En esta rama también siguen registradas las rutas tradicionales del feed, perfiles y operaciones resource. Por eso, la implementación Livewire del feed se visita en `/chirp/home`; la ruta `/` continúa usando el controlador tradicional. Los perfiles siguen usando sus rutas existentes.
+
+Para cambiar entre implementaciones:
+
+```bash
+git switch master
+git switch feature/livewire
+```
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
